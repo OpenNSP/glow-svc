@@ -1,0 +1,2 @@
+./dataset/44k/yuuka/6903911338nb3116Vocals4800019.wav
+./dataset/44k/yuuka/656221.wav
