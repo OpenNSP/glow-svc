@@ -6,10 +6,6 @@
 
 </div>
 
-## Announcement
-
-The purpose of this project was to enable developers to have their beloved anime characters perform singing tasks. The developers' intention was to focus solely on fictional characters and avoid any involvement of real individuals, anything related to real individuals deviates from the developer's original intention.
-
 ## Disclaimer
 
 The project is [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc) non-end-to-end version, Acoustic model is [Glow-TTS](https://github.com/jaywalnut310/glow-tts), is currently a Beta version, there are a lot of bug (didn't even change the Readme).
