@@ -1,6 +1,6 @@
 <div align="center">
   
-# Glow VITS Singing Voice Conversion
+# Glow Singing Voice Conversion
 
 [**English**](./README.md) | [**中文简体**](./README_zh_CN.md)
 
