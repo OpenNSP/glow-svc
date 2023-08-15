@@ -236,7 +236,6 @@ class SynthesizerTrn(nn.Module):
 
         modules.set_Conv1dModel(self.use_depthwise_conv)
 
-        self.enc_q = Encoder(spec_channels, inter_channels, hidden_channels, 5, 1, 16, gin_channels=gin_channels)
         self.flow = ResidualCouplingBlock(inter_channels, hidden_channels, 5, 1, n_flow_layer, gin_channels=gin_channels, share_parameter= flow_share_parameter)
         if self.use_automatic_f0_prediction:
             self.f0_decoder = F0Decoder(
