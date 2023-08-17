@@ -28,7 +28,7 @@ class ActNorm(nn.Module):
     self.logs = nn.Parameter(torch.zeros(1, channels, 1))
     self.bias = nn.Parameter(torch.zeros(1, channels, 1))
 
-  def forward(self, x, x_mask=None, reverse=False, **kwargs):
+  def forward(self, x, x_mask=None, g=None, reverse=False, **kwargs):
     if x_mask is None:
       x_mask = torch.ones(x.size(0), 1, x.size(2)).to(device=x.device, dtype=x.dtype)
     x_len = torch.sum(x_mask, [1, 2])
@@ -79,7 +79,7 @@ class InvConvNear(nn.Module):
       w_init[:,0] = -1 * w_init[:,0]
     self.weight = nn.Parameter(w_init)
 
-  def forward(self, x, x_mask=None, reverse=False, **kwargs):
+  def forward(self, x, x_mask=None, g=None, reverse=False, **kwargs):
     b, c, t = x.size()
     assert(c % self.n_split == 0)
     if x_mask is None:
