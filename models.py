@@ -6,7 +6,7 @@ import modules.commons as commons
 import modules.modules as modules
 import utils
 from utils import f0_to_coarse
-
+from modules.modules import ActNorm, InvConvNear
 
 class ResidualCouplingBlock(nn.Module):
     def __init__(self,
@@ -33,10 +33,12 @@ class ResidualCouplingBlock(nn.Module):
         self.wn = modules.WN(hidden_channels, kernel_size, dilation_rate, n_layers, p_dropout=0, gin_channels=gin_channels) if share_parameter else None
 
         for i in range(n_flows):
+            self.flows.append(ActNorm(channels=channels))
+            self.flows.append(InvConvNear(channels=channels, n_split= 4))
             self.flows.append(
                 modules.ResidualCouplingLayer(channels, hidden_channels, kernel_size, dilation_rate, n_layers,
                                               gin_channels=gin_channels, mean_only=True, wn_sharing_parameter=self.wn))
-            self.flows.append(modules.Flip())
+            # self.flows.append(modules.Flip())
 
     def forward(self, x, x_mask, g=None, reverse=False):
         if not reverse:

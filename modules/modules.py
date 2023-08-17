@@ -19,6 +19,101 @@ def set_Conv1dModel(use_depthwise_conv):
     Conv1dModel = Depthwise_Separable_Conv1D if use_depthwise_conv else nn.Conv1d
 
 
+class ActNorm(nn.Module):
+  def __init__(self, channels, ddi=False, **kwargs):
+    super().__init__()
+    self.channels = channels
+    self.initialized = not ddi
+
+    self.logs = nn.Parameter(torch.zeros(1, channels, 1))
+    self.bias = nn.Parameter(torch.zeros(1, channels, 1))
+
+  def forward(self, x, x_mask=None, reverse=False, **kwargs):
+    if x_mask is None:
+      x_mask = torch.ones(x.size(0), 1, x.size(2)).to(device=x.device, dtype=x.dtype)
+    x_len = torch.sum(x_mask, [1, 2])
+    if not self.initialized:
+      self.initialize(x, x_mask)
+      self.initialized = True
+
+    if reverse:
+      z = (x - self.bias) * torch.exp(-self.logs) * x_mask
+      logdet = None
+    else:
+      z = (self.bias + torch.exp(self.logs) * x) * x_mask
+      logdet = torch.sum(self.logs) * x_len # [b]
+
+    return z, logdet
+
+  def store_inverse(self):
+    pass
+
+  def set_ddi(self, ddi):
+    self.initialized = not ddi
+
+  def initialize(self, x, x_mask):
+    with torch.no_grad():
+      denom = torch.sum(x_mask, [0, 2])
+      m = torch.sum(x * x_mask, [0, 2]) / denom
+      m_sq = torch.sum(x * x * x_mask, [0, 2]) / denom
+      v = m_sq - (m ** 2)
+      logs = 0.5 * torch.log(torch.clamp_min(v, 1e-6))
+
+      bias_init = (-m * torch.exp(-logs)).view(*self.bias.shape).to(dtype=self.bias.dtype)
+      logs_init = (-logs).view(*self.logs.shape).to(dtype=self.logs.dtype)
+
+      self.bias.data.copy_(bias_init)
+      self.logs.data.copy_(logs_init)
+      
+  
+class InvConvNear(nn.Module):
+  def __init__(self, channels, n_split=4, no_jacobian=False, **kwargs):
+    super().__init__()
+    assert(n_split % 2 == 0)
+    self.channels = channels
+    self.n_split = n_split
+    self.no_jacobian = no_jacobian
+    
+    w_init = torch.qr(torch.FloatTensor(self.n_split, self.n_split).normal_())[0]
+    if torch.det(w_init) < 0:
+      w_init[:,0] = -1 * w_init[:,0]
+    self.weight = nn.Parameter(w_init)
+
+  def forward(self, x, x_mask=None, reverse=False, **kwargs):
+    b, c, t = x.size()
+    assert(c % self.n_split == 0)
+    if x_mask is None:
+      x_mask = 1
+      x_len = torch.ones((b,), dtype=x.dtype, device=x.device) * t
+    else:
+      x_len = torch.sum(x_mask, [1, 2])
+
+    x = x.view(b, 2, c // self.n_split, self.n_split // 2, t)
+    x = x.permute(0, 1, 3, 2, 4).contiguous().view(b, self.n_split, c // self.n_split, t)
+
+    if reverse:
+      if hasattr(self, "weight_inv"):
+        weight = self.weight_inv
+      else:
+        weight = torch.inverse(self.weight.float()).to(dtype=self.weight.dtype)
+      logdet = None
+    else:
+      weight = self.weight
+      if self.no_jacobian:
+        logdet = 0
+      else:
+        logdet = torch.logdet(self.weight) * (c / self.n_split) * x_len # [b]
+
+    weight = weight.view(self.n_split, self.n_split, 1, 1)
+    z = F.conv2d(x, weight)
+
+    z = z.view(b, 2, self.n_split // 2, c // self.n_split, t)
+    z = z.permute(0, 1, 3, 2, 4).contiguous().view(b, c, t) * x_mask
+    return z, logdet
+
+  def store_inverse(self):
+    self.weight_inv = torch.inverse(self.weight.float()).to(dtype=self.weight.dtype)
+
 class LayerNorm(nn.Module):
   def __init__(self, channels, eps=1e-5):
     super().__init__()
