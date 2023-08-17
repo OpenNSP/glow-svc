@@ -138,9 +138,9 @@ def main():
             audio = svc_model.slice_inference(**kwarg)
             key = "auto" if auto_predict_f0 else f"{tran}key"
             cluster_name = "" if cluster_infer_ratio == 0 else f"_{cluster_infer_ratio}"
-            isdiffusion = "sovits"
+            isdiffusion = "glow"
             if shallow_diffusion :
-                isdiffusion = "sovdiff"
+                isdiffusion = "glowdiff"
             if only_diffusion :
                 isdiffusion = "diff"
             if use_spk_mix:
