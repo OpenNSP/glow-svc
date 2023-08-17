@@ -39,11 +39,12 @@ class ActNorm(nn.Module):
     if reverse:
       z = (x - self.bias) * torch.exp(-self.logs) * x_mask
       logdet = None
+      return z
     else:
       z = (self.bias + torch.exp(self.logs) * x) * x_mask
       logdet = torch.sum(self.logs) * x_len # [b]
-
-    return z, logdet
+      return z, logdet
+    
 
   def store_inverse(self):
     pass
@@ -109,7 +110,10 @@ class InvConvNear(nn.Module):
 
     z = z.view(b, 2, self.n_split // 2, c // self.n_split, t)
     z = z.permute(0, 1, 3, 2, 4).contiguous().view(b, c, t) * x_mask
-    return z, logdet
+    if reverse:
+      return z
+    else:
+      return z, logdet
 
   def store_inverse(self):
     self.weight_inv = torch.inverse(self.weight.float()).to(dtype=self.weight.dtype)
