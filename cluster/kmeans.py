@@ -28,7 +28,7 @@ def _kpp(data: torch.Tensor, k: int, sample_size: int = -1):
 
     References
     ----------
-    .. [1] D. Arthur and S. Vassilvitskii, "k-means++: the advantages of
+    .. [1] D. Arthur and S. Vassilkii, "k-means++: the advantages of
        careful seeding", Proceedings of the Eighteenth Annual ACM-SIAM Symposium
        on Discrete Algorithms, 2007.
     .. [2] scipy/cluster/vq.py: _kpp

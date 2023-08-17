@@ -168,9 +168,9 @@ def vc_infer(output_format, sid, audio_path, truncated_basename, vc_transform, a
         os.makedirs("results")
     key = "auto" if auto_f0 else f"{int(vc_transform)}key"
     cluster = "_" if cluster_ratio == 0 else f"_{cluster_ratio}_"
-    isdiffusion = "sovits"
+    isdiffusion = "glow"
     if model.shallow_diffusion:
-        isdiffusion = "sovdiff"
+        isdiffusion = "glowdiff"
 
     if model.only_diffusion:
         isdiffusion = "diff"

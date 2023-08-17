@@ -309,7 +309,7 @@ class Svc(object):
             if loudness_envelope_adjustment != 1:
                 audio = utils.change_rms(wav,self.target_sample,audio,self.target_sample,loudness_envelope_adjustment)
             use_time = time.time() - start
-            print("vits use time:{}".format(use_time))
+            print("glow use time:{}".format(use_time))
         return audio, audio.shape[-1], n_frames
 
     def clear_empty(self):
