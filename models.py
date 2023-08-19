@@ -16,6 +16,7 @@ class ResidualCouplingBlock(nn.Module):
                  dilation_rate,
                  n_layers,
                  n_flows=4,
+                 n_sqz = 2,
                  gin_channels=0,
                  share_parameter=False
                  ):
@@ -27,7 +28,8 @@ class ResidualCouplingBlock(nn.Module):
         self.n_layers = n_layers
         self.n_flows = n_flows
         self.gin_channels = gin_channels
-
+        self.n_sqz = n_sqz
+        
         self.flows = nn.ModuleList()
 
         self.wn = modules.WN(hidden_channels, kernel_size, dilation_rate, n_layers, p_dropout=0, gin_channels=gin_channels) if share_parameter else None
@@ -41,6 +43,9 @@ class ResidualCouplingBlock(nn.Module):
             # self.flows.append(modules.Flip())
 
     def forward(self, x, x_mask, g=None, reverse=False):
+        
+        if self.n_sqz > 1:
+            x, x_mask = commons.squeeze(x, x_mask, self.n_sqz)
         if not reverse:
             logdet_tot = 0
             for flow in self.flows:
@@ -50,6 +55,10 @@ class ResidualCouplingBlock(nn.Module):
             logdet_tot = None
             for flow in reversed(self.flows):
                 x = flow(x, x_mask, g=g, reverse=reverse)
+        if self.n_sqz > 1:
+            x, x_mask = commons.unsqueeze(x, x_mask, self.n_sqz)
+                
+
         return x, logdet_tot
 
 
@@ -190,13 +199,12 @@ class SynthesizerTrn(nn.Module):
                  gin_channels,
                  ssl_dim,
                  n_speakers,
-                 sampling_rate=44100,
                  vol_embedding=False,
-                 vocoder_name = "nsf-hifigan",
                  use_depthwise_conv = False,
                  use_automatic_f0_prediction = True,
                  flow_share_parameter = False,
                  n_flow_layer = 4,
+                 n_sqz = 2,
                  **kwargs):
 
         super().__init__()
@@ -221,6 +229,8 @@ class SynthesizerTrn(nn.Module):
         self.emb_g = nn.Embedding(n_speakers, gin_channels)
         self.use_depthwise_conv = use_depthwise_conv
         self.use_automatic_f0_prediction = use_automatic_f0_prediction
+        self.n_sqz = n_sqz
+        
         if vol_embedding:
            self.emb_vol = nn.Linear(1, hidden_channels)
 
