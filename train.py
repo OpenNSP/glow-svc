@@ -120,6 +120,7 @@ def run(rank, n_gpus, hps):
 
 
 def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loaders, logger, writers, vocoder):
+    image_dict = {}
     train_loader, eval_loader = loaders
     if writers is not None:
         writer, writer_eval = writers
