@@ -12,7 +12,7 @@ The project is [so-vits-svc](https://github.com/svc-develop-team/so-vits-svc) no
 
 ## 📏 Terms of Use
 
-# Warning: Please ensure that you address any authorization issues related to the dataset on your own. You bear full responsibility for any problems arising from the usage of non-authorized datasets for training, as well as any resulting consequences. The repository and its maintainer, svc develop team, disclaim any association with or liability for the consequences. 
+# Warning: Please ensure that you address any authorization issues related to the dataset on your own. You bear full responsibility for any problems arising from the usage of non-authorized datasets for training, as well as any resulting consequences. The repository and its maintainerdisclaim any association with or liability for the consequences. 
 
 1. This project is exclusively established for academic purposes, aiming to facilitate communication and learning. It is not intended for deployment in production environments.
 2. Any Glow-SVC-based video posted to a video platform must clearly specify in the introduction the input source vocals and audio used for the voice changer conversion, e.g., if you use someone else's video/audio and convert it by separating the vocals as the input source, you must give a clear link to the original video or music; if you use your own vocals or a voice synthesized by another voice synthesis engine as the input source, you must also state this in your introduction.
@@ -36,6 +36,19 @@ Based on our testing, we have determined that the project runs stable on `Python
 ## 📥 Pre-trained Model Files
 
 #### **Required**
+
+
+##### NSF-HIFIGAN
+- Pre-trained NSF-HIFIGAN Vocoder: [nsf_hifigan_20221211.zip](https://github.com/openvpi/vocoders/releases/download/nsf-hifigan-v1/nsf_hifigan_20221211.zip)
+  - Unzip and place the four files under the `pretrain/nsf_hifigan` directory
+
+```shell
+# nsf_hifigan
+wget -P pretrain/ https://github.com/openvpi/vocoders/releases/download/nsf-hifigan-v1/nsf_hifigan_20221211.zip
+unzip -od pretrain/nsf_hifigan pretrain/nsf_hifigan_20221211.zip
+# Alternatively, you can manually download and place it in the pretrain/nsf_hifigan directory
+# URL: https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1
+```
 
 **You need to select one encoder from the list below**
 
@@ -77,18 +90,9 @@ wget -P pretrain/ https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/mai
 - download model at  [WavLM-Base+.pt](https://valle.blob.core.windows.net/share/wavlm/WavLM-Base+.pt?sv=2020-08-04&st=2023-03-01T07%3A51%3A05Z&se=2033-03-02T07%3A51%3A00Z&sr=c&sp=rl&sig=QJXmSJG9DbMKf48UDIU1MfzIro8HQOf3sqlNXiflY1I%3D), the model fits `wavlmbase+`
   - Place it under the `pretrain` directory
 
-##### **7. If OnnxHubert/ContentVec as the encoder**
-- download model at [MoeSS-SUBModel](https://huggingface.co/NaruseMioShirakana/MoeSS-SUBModel/tree/main)
-  - Place it under the `pretrain` directory
-
 #### **List of Encoders**
 - "vec768l12"
 - "vec256l9"
-- "vec256l9-onnx"
-- "vec256l12-onnx"
-- "vec768l9-onnx"
-- "vec768l12-onnx"
-- "hubertsoft-onnx"
 - "hubertsoft"
 - "whisper-ppg"
 - "cnhubertlarge"
@@ -96,20 +100,7 @@ wget -P pretrain/ https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/mai
 - "whisper-ppg-large"
 - "wavlmbase+"
 
-##### NSF-HIFIGAN
 
-If you are using the `NSF-HIFIGAN enhancer` or `shallow diffusion`, you will need to download the pre-trained NSF-HIFIGAN model.
-
-- Pre-trained NSF-HIFIGAN Vocoder: [nsf_hifigan_20221211.zip](https://github.com/openvpi/vocoders/releases/download/nsf-hifigan-v1/nsf_hifigan_20221211.zip)
-  - Unzip and place the four files under the `pretrain/nsf_hifigan` directory
-
-```shell
-# nsf_hifigan
-wget -P pretrain/ https://github.com/openvpi/vocoders/releases/download/nsf-hifigan-v1/nsf_hifigan_20221211.zip
-unzip -od pretrain/nsf_hifigan pretrain/nsf_hifigan_20221211.zip
-# Alternatively, you can manually download and place it in the pretrain/nsf_hifigan directory
-# URL: https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1
-```
 
 #### **Optional(Strongly recommend)**
 
@@ -119,7 +110,7 @@ unzip -od pretrain/nsf_hifigan pretrain/nsf_hifigan_20221211.zip
 - Diffusion model pretraining base model file: `model_0.pt`
   - Put it in the `logs/44k/diffusion` directory
 
-Get Glow-SVC Pre-trained model from svc-develop-team(TBD) or anywhere else.
+Get Glow-SVC Pre-trained models from this repository or anywhere else.
 
 Diffusion model references [Diffusion-SVC](https://github.com/CNChTu/Diffusion-SVC) diffusion model. The pre-trained diffusion model is universal with the DDSP-SVC's. You can go to [Diffusion-SVC](https://github.com/CNChTu/Diffusion-SVC)'s repo to get the pre-trained diffusion model.
 
@@ -452,24 +443,6 @@ Note: For Hubert Onnx models, please use the models provided by MoeSS. Currently
 | | Feature TopK Retrieval (PreProcessing)| Retrieval based Voice Conversion | [RVC-Project/Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI) |
 
 
-## ☀️ Previous contributors
-
-For some reason the author deleted the original repository. Because of the negligence of the organization members, the contributor list was cleared because all files were directly reuploaded to this repository at the beginning of the reconstruction of this repository. Now add a previous contributor list to README.md.
-
-*Some members have not listed according to their personal wishes.*
-
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/MistEO"><img src="https://avatars.githubusercontent.com/u/18511905?v=4" width="100px;" alt=""/><br /><sub><b>MistEO</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/XiaoMiku01"><img src="https://avatars.githubusercontent.com/u/54094119?v=4" width="100px;" alt=""/><br /><sub><b>XiaoMiku01</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/ForsakenRei"><img src="https://avatars.githubusercontent.com/u/23041178?v=4" width="100px;" alt=""/><br /><sub><b>しぐれ</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/TomoGaSukunai"><img src="https://avatars.githubusercontent.com/u/25863522?v=4" width="100px;" alt=""/><br /><sub><b>TomoGaSukunai</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/Plachtaa"><img src="https://avatars.githubusercontent.com/u/112609742?v=4" width="100px;" alt=""/><br /><sub><b>Plachtaa</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/zdxiaoda"><img src="https://avatars.githubusercontent.com/u/45501959?v=4" width="100px;" alt=""/><br /><sub><b>zd小达</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/Archivoice"><img src="https://avatars.githubusercontent.com/u/107520869?v=4" width="100px;" alt=""/><br /><sub><b>凍聲響世</b></sub></a><br /></td>
-  </tr>
-</table>
-
 ## 📚 Some legal provisions for reference
 
 #### Any country, region, organization, or individual using this project must comply with the following laws.
@@ -497,6 +470,6 @@ For some reason the author deleted the original repository. Because of the negli
 #### 《[中华人民共和国合同法](http://www.npc.gov.cn/zgrdw/npc/lfzt/rlyw/2016-07/01/content_1992739.htm)》
 
 ## 💪 Thanks to all contributors for their efforts
-<a href="https://github.com/svc-develop-team/so-vits-svc/graphs/contributors" target="_blank">
-  <img src="https://contrib.rocks/image?repo=svc-develop-team/so-vits-svc" />
+<a href="https://github.com/ylzz1997/glow-svc/graphs/contributors" target="_blank">
+  <img src="https://contrib.rocks/image?repo=ylzz1997/glow-svc" />
 </a>
