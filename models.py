@@ -38,8 +38,7 @@ class ResidualCouplingBlock(nn.Module):
             self.flows.append(ActNorm(channels=channels * n_sqz))
             self.flows.append(InvConvNear(channels=channels * n_sqz, n_split= 4))
             self.flows.append(
-                modules.ResidualCouplingLayer(channels * n_sqz, hidden_channels, kernel_size, dilation_rate, n_layers,
-                                              gin_channels=gin_channels, mean_only=True, wn_sharing_parameter=self.wn))
+                modules.ResidualCouplingLayer(channels * n_sqz, hidden_channels, kernel_size, dilation_rate, n_layers, gin_channels=gin_channels, mean_only=True, wn_sharing_parameter=self.wn))
             # self.flows.append(modules.Flip())
 
     def forward(self, x, x_mask, g=None, reverse=False):
@@ -281,7 +280,7 @@ class SynthesizerTrn(nn.Module):
         # ssl prenet
         mel, c_lengths, c_max_length = self.preprocess(mel, c_lengths, mel.size(2))
         x_mask = torch.unsqueeze(commons.sequence_mask(c_lengths, c_max_length), 1).to(c.dtype)
-        f0 = f0[:,:c_max_length]
+        f0, uv = f0[:,:c_max_length], uv[:,:c_max_length]
         x = (self.pre(c) + self.emb_uv(uv.long()).transpose(1,2) + vol + xg)[:,:,:c_max_length] * x_mask
         
         # f0 predict
