@@ -281,7 +281,7 @@ class SynthesizerTrn(nn.Module):
         # ssl prenet
         x_mask = torch.unsqueeze(commons.sequence_mask(c_lengths, c.size(2)), 1).to(c.dtype)
         x = self.pre(c) * x_mask + self.emb_uv(uv.long()).transpose(1,2) + vol + xg
-        mel = self.preprocess(mel, mel.size(-2), None)
+        mel = self.preprocess(mel, mel.size(2),c_lengths)
         
         # f0 predict
         if self.use_automatic_f0_prediction:
