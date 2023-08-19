@@ -2,7 +2,7 @@ import math
 
 import torch
 from torch.nn import functional as F
-
+import numpy as np
 
 def slice_pitch_segments(x, ids_str, segment_size=4):
   ret = torch.zeros_like(x[:, :segment_size])
@@ -209,3 +209,47 @@ def unsqueeze(x, x_mask=None, n_sqz=2):
   else:
     x_mask = torch.ones(b, 1, t*n_sqz).to(device=x.device, dtype=x.dtype)
   return x_unsqz * x_mask, x_mask
+
+class Adam():
+  def __init__(self, params, scheduler, dim_model, warmup_steps=4000, lr=1e0, betas=(0.9, 0.98), eps=1e-9):
+    self.params = params
+    self.scheduler = scheduler
+    self.dim_model = dim_model
+    self.warmup_steps = warmup_steps
+    self.lr = lr
+    self.betas = betas
+    self.eps = eps
+
+    self.step_num = 1
+    self.cur_lr = lr * self._get_lr_scale()
+    
+    self._optim = torch.optim.Adam(params, lr=self.cur_lr, betas=betas, eps=eps)
+
+  def _get_lr_scale(self):
+    if self.scheduler == "noam":
+      return np.power(self.dim_model, -0.5) * np.min([np.power(self.step_num, -0.5), self.step_num * np.power(self.warmup_steps, -1.5)])
+    else:
+      return 1
+
+  def _update_learning_rate(self):
+    self.step_num += 1
+    if self.scheduler == "noam":
+      self.cur_lr = self.lr * self._get_lr_scale()
+      for param_group in self._optim.param_groups:
+        param_group['lr'] = self.cur_lr
+
+  def get_lr(self):
+    return self.cur_lr
+
+  def step(self):
+    self._optim.step()
+    self._update_learning_rate()
+
+  def zero_grad(self):
+    self._optim.zero_grad()
+
+  def load_state_dict(self, d):
+    self._optim.load_state_dict(d)
+
+  def state_dict(self):
+    return self._optim.state_dict()
