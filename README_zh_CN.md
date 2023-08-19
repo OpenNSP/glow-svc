@@ -11,7 +11,7 @@
 
 ## 📏 使用规约
 
-# Warning：请自行解决数据集授权问题，禁止使用非授权数据集进行训练！任何由于使用非授权数据集进行训练造成的问题，需自行承担全部责任和后果！与仓库、仓库维护者、svc develop team 无关！
+# Warning：请自行解决数据集授权问题，禁止使用非授权数据集进行训练！任何由于使用非授权数据集进行训练造成的问题，需自行承担全部责任和后果！与仓库、仓库维护者无关！
 
 1. 本项目是基于学术交流目的建立，仅供交流与学习使用，并非为生产环境准备。
 2. 任何发布到视频平台的基于 Glow-SVC 制作的视频，都必须要在简介明确指明用于变声器转换的输入源歌声、音频，例如：使用他人发布的视频 / 音频，通过分离的人声作为输入源进行转换的，必须要给出明确的原视频、音乐链接；若使用是自己的人声，或是使用其他歌声合成引擎合成的声音作为输入源进行转换的，也必须在简介加以说明。
@@ -35,6 +35,18 @@
 
 #### **必须项**
 
+
+##### NSF-HIFIGAN
++ 预训练的 NSF-HIFIGAN 声码器 ：[nsf_hifigan_20221211.zip](https://github.com/openvpi/vocoders/releases/download/nsf-hifigan-v1/nsf_hifigan_20221211.zip)
+  + 解压后，将四个文件放在`pretrain/nsf_hifigan`目录下
+
+```shell
+# nsf_hifigan
+wget -P pretrain/ https://github.com/openvpi/vocoders/releases/download/nsf-hifigan-v1/nsf_hifigan_20221211.zip
+unzip -od pretrain/nsf_hifigan pretrain/nsf_hifigan_20221211.zip
+# 也可手动下载放在 pretrain/nsf_hifigan 目录
+# 地址：https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1
+```
 **编码器(以下编码器需要选择一个使用)**
 
 ##### **1. 若使用 contentvec 作为声音编码器（推荐）**
@@ -75,39 +87,15 @@ wget -P pretrain/ https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/mai
 + 下载模型 [WavLM-Base+.pt](https://valle.blob.core.windows.net/share/wavlm/WavLM-Base+.pt?sv=2020-08-04&st=2023-03-01T07%3A51%3A05Z&se=2033-03-02T07%3A51%3A00Z&sr=c&sp=rl&sig=QJXmSJG9DbMKf48UDIU1MfzIro8HQOf3sqlNXiflY1I%3D), 该模型适配`wavlmbase+`
   + 放在`pretrain`目录下
 
-##### **7. 若使用 OnnxHubert/ContentVec 作为声音编码器**
-+ 下载模型 [MoeSS-SUBModel](https://huggingface.co/NaruseMioShirakana/MoeSS-SUBModel/tree/main)
-  + 放在`pretrain`目录下
-
 #### **编码器列表**
 - "vec768l12"
 - "vec256l9"
-- "vec256l9-onnx"
-- "vec256l12-onnx"
-- "vec768l9-onnx"
-- "vec768l12-onnx"
-- "hubertsoft-onnx"
 - "hubertsoft"
 - "whisper-ppg"
 - "cnhubertlarge"
 - "dphubert"
 - "whisper-ppg-large"
 - "wavlmbase+"
-
-##### NSF-HIFIGAN
-
-如果使用`NSF-HIFIGAN 增强器`或`浅层扩散`的话，需要下载预训练的 NSF-HIFIGAN 模型，如果不需要可以不下载
-
-+ 预训练的 NSF-HIFIGAN 声码器 ：[nsf_hifigan_20221211.zip](https://github.com/openvpi/vocoders/releases/download/nsf-hifigan-v1/nsf_hifigan_20221211.zip)
-  + 解压后，将四个文件放在`pretrain/nsf_hifigan`目录下
-
-```shell
-# nsf_hifigan
-wget -P pretrain/ https://github.com/openvpi/vocoders/releases/download/nsf-hifigan-v1/nsf_hifigan_20221211.zip
-unzip -od pretrain/nsf_hifigan pretrain/nsf_hifigan_20221211.zip
-# 也可手动下载放在 pretrain/nsf_hifigan 目录
-# 地址：https://github.com/openvpi/vocoders/releases/tag/nsf-hifigan-v1
-```
 
 
 #### **可选项（强烈建议使用）**
@@ -118,7 +106,7 @@ unzip -od pretrain/nsf_hifigan pretrain/nsf_hifigan_20221211.zip
 + 扩散模型预训练底模文件： `model_0.pt `
   + 放在`logs/44k/diffusion`目录下
 
-从 svc-develop-team（待定）或任何其他地方获取 Glow-SVC 底模
+从本仓库或任何其他地方获取 Glow-SVC 底模
 
 扩散模型引用了 [Diffusion-SVC](https://github.com/CNChTu/Diffusion-SVC) 的 Diffusion Model，底模与 [Diffusion-SVC](https://github.com/CNChTu/Diffusion-SVC) 的扩散模型底模通用，可以去 [Diffusion-SVC](https://github.com/CNChTu/Diffusion-SVC) 获取扩散模型的底模
 
@@ -453,24 +441,6 @@ python compress_model.py -c="configs/config.json" -i="logs/44k/G_30400.pth" -o="
 |[K-means](https://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=01D65490BADCC216F350D06F84D721AD?doi=10.1.1.308.8619&rep=rep1&type=pdf) | Feature K-means Clustering (PreProcessing)| Some methods for classification and analysis of multivariate observations | 本代码库 |
 | | Feature TopK Retrieval (PreProcessing)| Retrieval based Voice Conversion | [RVC-Project/Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI) |
 
-## ☀️ 旧贡献者
-
-因为某些原因原作者进行了删库处理，本仓库重建之初由于组织成员疏忽直接重新上传了所有文件导致以前的 contributors 全部木大，现在在 README 里重新添加一个旧贡献者列表
-
-*某些成员已根据其个人意愿不将其列出*
-
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/MistEO"><img src="https://avatars.githubusercontent.com/u/18511905?v=4" width="100px;" alt=""/><br /><sub><b>MistEO</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/XiaoMiku01"><img src="https://avatars.githubusercontent.com/u/54094119?v=4" width="100px;" alt=""/><br /><sub><b>XiaoMiku01</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/ForsakenRei"><img src="https://avatars.githubusercontent.com/u/23041178?v=4" width="100px;" alt=""/><br /><sub><b>しぐれ</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/TomoGaSukunai"><img src="https://avatars.githubusercontent.com/u/25863522?v=4" width="100px;" alt=""/><br /><sub><b>TomoGaSukunai</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/Plachtaa"><img src="https://avatars.githubusercontent.com/u/112609742?v=4" width="100px;" alt=""/><br /><sub><b>Plachtaa</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/zdxiaoda"><img src="https://avatars.githubusercontent.com/u/45501959?v=4" width="100px;" alt=""/><br /><sub><b>zd 小达</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/Archivoice"><img src="https://avatars.githubusercontent.com/u/107520869?v=4" width="100px;" alt=""/><br /><sub><b>凍聲響世</b></sub></a><br /></td>
-  </tr>
-</table>
-
 ## 📚 一些法律条例参考
 
 #### 任何国家，地区，组织和个人使用此项目必须遵守以下法律
@@ -498,6 +468,6 @@ python compress_model.py -c="configs/config.json" -i="logs/44k/G_30400.pth" -o="
 #### 《[中华人民共和国合同法](http://www.npc.gov.cn/zgrdw/npc/lfzt/rlyw/2016-07/01/content_1992739.htm)》
 
 ## 💪 感谢所有的贡献者
-<a href="https://github.com/svc-develop-team/so-vits-svc/graphs/contributors" target="_blank">
-  <img src="https://contrib.rocks/image?repo=svc-develop-team/so-vits-svc" />
+<a href="https://github.com/ylzz1997/glow-svc/graphs/contributors" target="_blank">
+  <img src="https://contrib.rocks/image?repo=ylzz1997/glow-svc" />
 </a>
