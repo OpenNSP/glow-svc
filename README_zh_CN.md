@@ -5,10 +5,6 @@
 [**English**](./README.md) | [**中文简体**](./README_zh_CN.md)
 </div>
 
-## 重要通知
-
-这个项目是为了让开发者最喜欢的动漫角色唱歌而开发的，任何涉及真人的东西都与开发者的意图背道而驰。
-
 ## 声明
 
 该项目是[so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)非端到端版本，声学模型是[Glow-TTS](https://github.com/jaywalnut310/glow-tts)，目前是Beta版本，坑甚多（甚至没改Readme）。
