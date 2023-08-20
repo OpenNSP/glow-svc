@@ -158,14 +158,14 @@ class ConvReluNorm(nn.Module):
     self.proj.weight.data.zero_()
     self.proj.bias.data.zero_()
 
-  def forward(self, x, x_mask):
+  def forward(self, x):
     x_org = x
     for i in range(self.n_layers):
-      x = self.conv_layers[i](x * x_mask)
+      x = self.conv_layers[i](x)
       x = self.norm_layers[i](x)
       x = self.relu_drop(x)
     x = x_org + self.proj(x)
-    return x * x_mask
+    return x
 
 
 class WN(torch.nn.Module):
