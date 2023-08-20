@@ -4,7 +4,8 @@
     "eval_interval": 800,
     "seed": 1234,
     "epochs": 10000,
-    "learning_rate": 0.0001,
+    "learning_rate": 1e0,
+    "scheduler" : "noam",
     "betas": [
       0.8,
       0.99
@@ -16,7 +17,7 @@
     "lr_decay": 0.999875,
     "segment_size": 10240,
     "init_lr_ratio": 1,
-    "warmup_epochs": 0,
+    "warmup_steps": 4000,
     "c_mel": 45,
     "c_kl": 1.0,
     "use_sr": true,

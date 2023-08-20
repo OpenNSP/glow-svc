@@ -75,9 +75,12 @@ def run(rank, n_gpus, hps):
         hps.data.filter_length // 2 + 1,
         hps.train.segment_size // hps.data.hop_length,
         **hps.model).cuda(rank)
-    optim_g = torch.optim.AdamW(
+    optim_g = commons.Adam(
         net_g.parameters(),
-        hps.train.learning_rate,
+        scheduler=hps.train.scheduler,
+        dim_model=hps.model.hidden_channels,
+        warmup_steps=hps.train.warmup_steps,
+        lr=hps.train.learning_rate,
         betas=hps.train.betas,
         eps=hps.train.eps)
     net_g = DDP(net_g, device_ids=[rank], find_unused_parameters=True)  # , find_unused_parameters=True)
@@ -90,6 +93,8 @@ def run(rank, n_gpus, hps):
         epoch_str = max(epoch_str, 1)
         name=utils.latest_checkpoint_path(hps.model_dir, "D_*.pth")
         global_step=int(name[name.rfind("_")+1:name.rfind(".")])+1
+        optim_g.step_num = global_step
+        optim_g._update_learning_rate()
         #global_step = (epoch_str - 1) * len(train_loader)
     except Exception:
         print("load old checkpoint failed...")
@@ -100,26 +105,23 @@ def run(rank, n_gpus, hps):
         global_step = 0
 
     warmup_epoch = hps.train.warmup_epochs
-    scheduler_g = torch.optim.lr_scheduler.ExponentialLR(optim_g, gamma=hps.train.lr_decay, last_epoch=epoch_str - 2)
     scaler = GradScaler(enabled=hps.train.fp16_run)
 
     for epoch in range(epoch_str, hps.train.epochs + 1):
         # set up warm-up learning rate
-        if epoch <= warmup_epoch:
-            for param_group in optim_g.param_groups:
-                param_group['lr'] = hps.train.learning_rate / warmup_epoch * epoch
+        # if epoch <= warmup_epoch:
+        #     for param_group in optim_g.param_groups:
+        #         param_group['lr'] = hps.train.learning_rate / warmup_epoch * epoch
         # training
         if rank == 0:
-            train_and_evaluate(rank, epoch, hps, net_g, optim_g, scheduler_g, scaler,
+            train_and_evaluate(rank, epoch, hps, net_g, optim_g, scaler,
                                [train_loader, eval_loader], logger, [writer, writer_eval],vocoder)
         else:
-            train_and_evaluate(rank, epoch, hps, net_g, optim_g, scheduler_g, scaler,
+            train_and_evaluate(rank, epoch, hps, net_g, optim_g, scaler,
                                [train_loader, None], None, None,vocoder)
-        # update learning rate
-        scheduler_g.step()
 
 
-def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loaders, logger, writers, vocoder):
+def train_and_evaluate(rank, epoch, hps, nets, optims, scaler, loaders, logger, writers, vocoder):
     image_dict = {}
     train_loader, eval_loader = loaders
     if writers is not None:
@@ -149,13 +151,14 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loade
         
         optims.zero_grad()
         scaler.scale(loss_mle).backward()
-        scaler.unscale_(optims)
-        scaler.step(optims)
+        scaler.unscale_(optims._optim)
+        scaler.step(optims._optim)
+        optims._update_learning_rate()
         scaler.update()
 
         if rank == 0:
             if global_step % hps.train.log_interval == 0:
-                lr = optims.param_groups[0]['lr']
+                lr = optims.get_lr()
                 logger.info('Train Epoch: {} [{:.0f}%]'.format(
                     epoch,
                     100. * batch_idx / len(train_loader)))
@@ -184,10 +187,8 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loade
 
             if global_step % hps.train.eval_interval == 0:
                 evaluate(hps, nets, eval_loader, writer_eval, vocoder)
-                utils.save_checkpoint(nets, optims, hps.train.learning_rate, epoch,
+                utils.save_checkpoint(nets, optims._optim, hps.train.learning_rate, epoch,
                                       os.path.join(hps.model_dir, "G_{}.pth".format(global_step)))
-                utils.save_checkpoint(nets, optims, hps.train.learning_rate, epoch,
-                                      os.path.join(hps.model_dir, "D_{}.pth".format(global_step)))
                 keep_ckpts = getattr(hps.train, 'keep_ckpts', 0)
                 if keep_ckpts > 0:
                     utils.clean_checkpoints(path_to_models=hps.model_dir, n_ckpts_to_keep=keep_ckpts, sort_by_time=True)
