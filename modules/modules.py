@@ -146,7 +146,8 @@ class ConvReluNorm(nn.Module):
 
     self.conv_layers = nn.ModuleList()
     self.norm_layers = nn.ModuleList()
-    self.conv_layers.append(Conv1dModel(in_channels, hidden_channels, kernel_size, padding=kernel_size//2))
+    self.pre = Conv1dModel(in_channels, hidden_channels, kernel_size, padding=kernel_size//2)
+    self.conv_layers.append(Conv1dModel(hidden_channels, hidden_channels, kernel_size, padding=kernel_size//2))
     self.norm_layers.append(LayerNorm(hidden_channels))
     self.relu_drop = nn.Sequential(
         nn.ReLU(),
@@ -159,6 +160,7 @@ class ConvReluNorm(nn.Module):
     self.proj.bias.data.zero_()
 
   def forward(self, x):
+    x = self.pre(x)
     x_org = x
     for i in range(self.n_layers):
       x = self.conv_layers[i](x)
