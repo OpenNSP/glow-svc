@@ -204,7 +204,7 @@ class SynthesizerTrn(nn.Module):
                  flow_share_parameter = False,
                  n_flow_layer = 4,
                  n_sqz = 2,
-                 use_crn_pre = False
+                 use_crn_pre = False,
                  **kwargs):
 
         super().__init__()
