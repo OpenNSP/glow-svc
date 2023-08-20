@@ -162,7 +162,7 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, scaler, loaders, logger, 
                     100. * batch_idx / len(train_loader)))
                 logger.info(f"Losses: {loss_mle}, step: {global_step}, lr: {lr}")
 
-                scalar_dict = {"loss_mle": loss_mle}
+                scalar_dict = {"loss_mle": loss_mle, "lr": lr}
 
                 # scalar_dict.update({"loss/g/{}".format(i): v for i, v in enumerate(losses_gen)})
                 # scalar_dict.update({"loss/d_r/{}".format(i): v for i, v in enumerate(losses_disc_r)})
