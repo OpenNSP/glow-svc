@@ -38,7 +38,7 @@ class ResidualCouplingBlock(nn.Module):
             self.flows.append(ActNorm(channels=channels * n_sqz))
             self.flows.append(InvConvNear(channels=channels * n_sqz, n_split= 4))
             self.flows.append(
-                modules.ResidualCouplingLayer(channels * n_sqz, hidden_channels, kernel_size, dilation_rate, n_layers, gin_channels=gin_channels, mean_only=True, wn_sharing_parameter=self.wn))
+                modules.ResidualCouplingLayer(channels * n_sqz, hidden_channels, kernel_size, dilation_rate, n_layers, gin_channels=gin_channels, mean_only=False, wn_sharing_parameter=self.wn))
             # self.flows.append(modules.Flip())
 
     def forward(self, x, x_mask, g=None, reverse=False):
