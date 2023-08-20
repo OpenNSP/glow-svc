@@ -103,8 +103,6 @@ def run(rank, n_gpus, hps):
     if skip_optimizer:
         epoch_str = 1
         global_step = 0
-
-    warmup_epoch = hps.train.warmup_epochs
     scaler = GradScaler(enabled=hps.train.fp16_run)
 
     for epoch in range(epoch_str, hps.train.epochs + 1):
