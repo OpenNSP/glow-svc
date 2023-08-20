@@ -91,6 +91,7 @@ class WaveNet(nn.Module):
         :return:
         """
         x = spec.squeeze(1)
+        cond = cond[:,:,:x.size(-1)]
         x = self.input_projection(x)  # [B, residual_channel, T]
 
         x = F.relu(x)
