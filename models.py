@@ -233,8 +233,8 @@ class SynthesizerTrn(nn.Module):
         if vol_embedding:
            self.emb_vol = nn.Linear(1, hidden_channels)
 
-        self.pre = nn.Conv1d(ssl_dim, hidden_channels, kernel_size=5, padding=2)
-
+        # self.pre = nn.Conv1d(ssl_dim, hidden_channels, kernel_size=5, padding=2)
+        self.pre = modules.ConvReluNorm(ssl_dim, hidden_channels, hidden_channels, kernel_size=5, n_layers=3, p_dropout=0.5)
         self.enc_p = TextEncoder(
             inter_channels,
             hidden_channels,
