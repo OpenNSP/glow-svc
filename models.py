@@ -203,6 +203,7 @@ class SynthesizerTrn(nn.Module):
                  use_automatic_f0_prediction = True,
                  flow_share_parameter = False,
                  n_flow_layer = 4,
+                 n_flow_block_layer = 12,
                  n_sqz = 2,
                  use_crn_pre = False,
                  **kwargs):
@@ -249,7 +250,7 @@ class SynthesizerTrn(nn.Module):
 
         modules.set_Conv1dModel(self.use_depthwise_conv)
 
-        self.flow = ResidualCouplingBlock(inter_channels, hidden_channels, 5, 1, n_flow_layer, gin_channels=gin_channels, share_parameter= flow_share_parameter)
+        self.flow = ResidualCouplingBlock(inter_channels, hidden_channels, 5, 1, n_flow_layer, n_flow_block_layer, gin_channels=gin_channels, share_parameter= flow_share_parameter)
         if self.use_automatic_f0_prediction:
             self.f0_decoder = F0Decoder(
                 1,
