@@ -4,7 +4,7 @@
     "eval_interval": 800,
     "seed": 1234,
     "epochs": 10000,
-    "learning_rate": 1e0,
+    "learning_rate": 7e-1,
     "scheduler" : "noam",
     "betas": [
       0.8,
