@@ -88,10 +88,10 @@ def run(rank, n_gpus, hps):
         vocoder = Vocoder('nsf-hifigan','pretrain/nsf_hifigan/model', device="cuda")
     skip_optimizer = False
     try:
-        _, _, _, epoch_str = utils.load_checkpoint(utils.latest_checkpoint_path(hps.model_dir, "G_*.pth"), net_g,
+        name = utils.latest_checkpoint_path(hps.model_dir, "G_*.pth")
+        _, _, _, epoch_str = utils.load_checkpoint(name, net_g,
                                                    optim_g, skip_optimizer)
         epoch_str = max(epoch_str, 1)
-        name=utils.latest_checkpoint_path(hps.model_dir, "D_*.pth")
         global_step=int(name[name.rfind("_")+1:name.rfind(".")])+1
         optim_g.step_num = global_step
         optim_g._update_learning_rate()
