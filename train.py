@@ -158,13 +158,9 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, scaler, loaders, logger, 
         if rank == 0:
             if global_step % hps.train.log_interval == 0:
                 lr = optims.get_lr()
-                logger.info('Train Epoch: {} [{:.0f}%]'.format(
-                    epoch,
-                    100. * batch_idx / len(train_loader)))
-                logger.info(f"Losses: {loss_mle}, step: {global_step}, lr: {lr}, ,grad_norm: {grad_norm}")
-
-                scalar_dict = {"loss_mle": loss_mle, "lr": lr, "grad_norm": grad_norm}
-
+                logger.info('Epoch: {} [{:.0f}%], step: {}, loss_mle: {}, lr: {} grad_norm: {}'.format(epoch, 100. * batch_idx / len(train_loader), global_step, loss_mle, lr, grad_norm))
+                scalar_dict = {"model/loss_mle": loss_mle, "model/lr": lr, "model/grad_norm": grad_norm}
+                
                 # scalar_dict.update({"loss/g/{}".format(i): v for i, v in enumerate(losses_gen)})
                 # scalar_dict.update({"loss/d_r/{}".format(i): v for i, v in enumerate(losses_disc_r)})
                 # scalar_dict.update({"loss/d_g/{}".format(i): v for i, v in enumerate(losses_disc_g)})
